@@ -73,6 +73,8 @@ def load_to_table(input_source_details):
         inbound_bucket = metadata_dict["inbound_bucket"]
         inbound_folder = metadata_dict["inbound_folder"]
         dataset_id = metadata_dict["bq_datasetname"]
+        table_id = metadata_dict["bq_table_name"]
+        table_id = f"poc-dna-gcp-cdp-623320.{dataset_id}.{table_id}"
 
         bigquery_client = bigquery.Client()
         source_bucket = bucket_client.get_bucket(inbound_bucket)
@@ -82,20 +84,35 @@ def load_to_table(input_source_details):
             file_name = source_blob.name.split('/')[-1]
             print("File Found", file_name, source_blob.size)
             if source_blob.name != search_prefix:
-                table_id = f"poc-dna-gcp-cdp-623320.{dataset_id}.{file_name.split('.')[0]}"
+                #table_id = f"poc-dna-gcp-cdp-623320.{dataset_id}.{file_name.split('.')[0]}"
+                test_table = f"poc-dna-gcp-cdp-623320.{dataset_id}.test_table"
                 cloud_file_uri = f"gs://{inbound_bucket}/{source_blob.name}"
 
-                print(f"Creating Table {table_id} from {cloud_file_uri}")
+                print(f"Creating Table {test_table} from {cloud_file_uri}")
 
                 job_config = bigquery.LoadJobConfig()
                 job_config.autodetect = True
                 job_config.source_format = bigquery.SourceFormat.CSV
 
-                load_job = bigquery_client.load_table_from_uri(cloud_file_uri,table_id, job_config=job_config)
+                load_job = bigquery_client.load_table_from_uri(cloud_file_uri,test_table, job_config=job_config)
                 load_job.result()  #Important waiting for table to create
                 print("Data Loaded in Table")
-                destination_table = bigquery_client.get_table(table_id)
-                print(f"Loaded Table: {table_id} with {destination_table.num_rows} rows.")
+                destination_table = bigquery_client.get_table(test_table)
+                print(f"Loaded Table: {test_table} with {destination_table.num_rows} rows.")
+
+                query_string1 = 'TRUNCATE TABLE ' + table_id + ';'
+                query_string1 += """
+                                INSERT INTO
+                                """
+                query_string1 += ' ' + table_id
+                query_string1 += " SELECT * FROM"
+                query_string1 += ' '+test_table+';'
+                query_string1 += 'DROP TABLE ' + test_table+';'
+
+
+                load_job = bigquery_client.query(query_string1)
+                load_job.result()
+
 
 
 

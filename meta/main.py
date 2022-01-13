@@ -1,0 +1,3 @@
+from meta import cdp_de_firestore_load_metadata
+
+cdp_de_firestore_load_metadata()

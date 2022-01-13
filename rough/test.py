@@ -1,16 +1,11 @@
-from google.cloud import firestore
+table_name = "csv"
+query_string1 = 'TRUNCATE TABLE ' + table_name + ';'
+query_string1 += """
+                        INSERT INTO
+                        """
+query_string1 += ' ' + table_name
+query_string1 += " SELECT *,split(_FILE_NAME,'/')[ordinal(%s)] LOAD_FILENAME FROM"
+query_string1 += ' ' + table_name + '_EXT;'
+query_string1 += 'DROP TABLE ' + table_name + '_EXT;'
 
-# Add a new document
-db = firestore.Client()
-doc_ref = db.collection(u'users').document(u'alovelace')
-doc_ref.set({
-    u'first': u'Ada',
-    u'last': u'Lovelace',
-    u'born': 1815
-})
-
-# Then query for documents
-users_ref = db.collection(u'users')
-
-for doc in users_ref.stream():
-    print(u'{} => {}'.format(doc.id, doc.to_dict()))
+print(query_string1)

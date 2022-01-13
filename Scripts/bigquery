@@ -1,0 +1,28 @@
+select ddl from `{projectID}.csv_load.INFORMATION_SCHEMA.TABLES`
+
+CREATE TABLE `poc-dna-gcp-cdp-623320.csv_load.temp_SalaryGender`
+(
+  Salary FLOAT64,
+  Gender INT64,
+  Age INT64,
+  PhD INT64
+);
+
+
+query_string = f'select ddl from `{project_id}.{dataset_id}.INFORMATION_SCHEMA.TABLES` where table_name = "{table_id}"'
+query_job = bigquery_client.query(query_string)
+
+
+###################################################
+query_string1 = 'TRUNCATE TABLE ' + table_name + ';'
+        query_string1 += """
+                        INSERT INTO
+                        """
+        query_string1 += ' ' + table_name
+        query_string1 += " SELECT *,split(_FILE_NAME,'/')[ordinal(%s)] LOAD_FILENAME FROM" % (ordinal_num)
+        query_string1 += ' ' + table_name + '_EXT;'
+        query_string1 += 'DROP TABLE ' + table_name + '_EXT;'
+
+        try:
+            load_job = bigquery_client.query(query_string1)
+            load_job.result()
