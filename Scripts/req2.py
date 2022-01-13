@@ -10,6 +10,7 @@ import tempfile, os, sys
 
 
 '''
+To add SQL Command
 gcp_pranav_archive : archive name
 gcp_test_csv : inbound bucket
 gcp_dataload_input : metadata collection name
