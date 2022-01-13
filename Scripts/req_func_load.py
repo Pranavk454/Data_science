@@ -99,13 +99,14 @@ def load_to_table(input_source_details):
                 print("Data Loaded in Table")
                 destination_table = bigquery_client.get_table(test_table)
                 print(f"Loaded Table: {test_table} with {destination_table.num_rows} rows.")
+                name = f"'{file_name}'"
 
                 query_string1 = 'TRUNCATE TABLE ' + table_id + ';'
                 query_string1 += """
                                 INSERT INTO
                                 """
                 query_string1 += ' ' + table_id
-                query_string1 += " SELECT * FROM"
+                query_string1 += " SELECT *,"+name + " FROM"
                 query_string1 += ' '+test_table+';'
                 query_string1 += 'DROP TABLE ' + test_table+';'
 
